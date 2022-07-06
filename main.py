@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: latin-1 -*-
 
 import sys
 import xml.etree.ElementTree as ET
@@ -18,20 +19,26 @@ def main(args):
 
         root = tree.getroot()
 
+        print('Translating {} items:'.format(len(root)))
         for amount in range(len(root)):
-            source = root[amount][5].text
+            source = root[amount][1].text
+            if source is None:
+                continue
             dest = ts.google(source, from_language='en', to_language='fi')
             if dest is not None:
-                title = ET.Element('description_fi')
-                title.text = dest
-                root[amount].append(title)
+                root[amount][2].text = dest
+                root[amount][3].text = "1"
+            print(".", end='', flush=True)
 
-        tree.write("sample_test.xml")
+        tree.write("output.xml", encoding='utf-8')
 
     except Exception as exep:
-        print("ERROR: Cannot read the XML file")
+        print(" ")
+        print("ERROR: Cannot read/write the XML file")
         print(exep)
         return
+
+    print(" All done. Check output.xml")
 
 
 if __name__ == '__main__':
